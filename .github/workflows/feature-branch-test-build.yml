@@ -10,18 +10,45 @@ on:
 permissions:
   id-token: write   # Required for OIDC auth
   contents: read    # Required to read repo contents
+  
+env:
+  IGNORE_PATTERN: (^README\.md$|^.gitignore|^.vscode/)
 
 jobs:
-  deploy:
-    name: Deploy
+  test-build:
+    name: Test build
     runs-on: ubuntu-latest
     environment: dev
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # fetch full history
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Detect code changes excluding README/docs
+        id: check_changes
+        run: |
+          MERGE_BASE=$(git merge-base origin/main HEAD)
+          
+          # Get list of changed files in the PR
+          CHANGED_FILES=$(git diff --name-only $MERGE_BASE ${{ github.event.after }})
+
+          # Filter out files to ignore (README.md, docs/**)
+          CODE_CHANGED=$(echo "$CHANGED_FILES" | grep -vE '${{ env.IGNORE_PATTERN }}')
+
+          # Output whether code changed
+          if [ -z "$CODE_CHANGED" ]; then
+            echo "No relevant code changes"
+            echo "code_changed=false" >> $GITHUB_ENV
+          else
+            echo "Code changes detected:"
+            echo "$CODE_CHANGED"
+            echo "code_changed=true" >> $GITHUB_ENV
+          fi
+
+      - name: Test-Build
+        if: env.code_changed == 'true'
         id: build
         run: |
           npm i
