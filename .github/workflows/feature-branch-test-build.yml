@@ -48,6 +48,9 @@ jobs:
           
           # Filter out files to ignore (README.md, docs/**)
           CODE_CHANGED=$(echo "$CHANGED_FILES" | grep -vE '${{ env.IGNORE_PATTERN }}')
+          echo "Code changes:"
+          echo "$CODE_CHANGED"
+          echo " "
           
           # Output whether code changed
           if [ -z "$CODE_CHANGED" ]; then
