@@ -10,6 +10,9 @@ on:
 permissions:
   id-token: write   # Required for OIDC auth
   contents: read    # Required to read repo contents
+  
+env:
+  IGNORE_PATTERN: (^README\.md$|^.gitignore|^.vscode/)
 
 jobs:
   test-build:
@@ -20,15 +23,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # fetch full history
 
       - name: Detect code changes excluding README/docs
         id: check_changes
         run: |
+          MERGE_BASE=$(git merge-base origin/main HEAD)
+          
           # Get list of changed files in the PR
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+          CHANGED_FILES=$(git diff --name-only $MERGE_BASE ${{ github.event.after }})
 
           # Filter out files to ignore (README.md, docs/**)
-          CODE_CHANGED=$(echo "$CHANGED_FILES" | grep -vE '(^README\.md$|^.gitignore|^.vscode/)')
+          CODE_CHANGED=$(echo "$CHANGED_FILES" | grep -vE '${{ env.IGNORE_PATTERN }}')
 
           # Output whether code changed
           if [ -z "$CODE_CHANGED" ]; then
