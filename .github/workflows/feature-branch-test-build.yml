@@ -29,9 +29,18 @@ jobs:
       - name: Detect code changes excluding README/docs
         id: check_changes
         run: |
-          COMMITS="${{ github.event.pull_request.commits }}"
-          PR_BASE="${{ github.event.pull_request.base.sha }}"
-          PR_HEAD="${{ github.event.pull_request.head.sha }}"
+          MERGE_SOURCE_BRANCH=${{ github.event.pull_request.head.ref }}
+          MERGE_TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
+          
+          echo "Merge source branch: $MERGE_SOURCE_BRANCH"
+          echo "Merge target branch: $MERGE_TARGET_BRANCH"
+
+          # Get branch point
+          BRANCH_POINT=$(git merge-base origin/$MERGE_TARGET_BRANCH $MERGE_SOURCE_BRANCH)
+          echo "Branch point: $BRANCH_POINT"
+
+          # Diff only feature branch changes
+          CHANGED_FILES=$(git diff --name-only $BRANCH_POINT $MERGE_SOURCE_BRANCH)
 
           echo "PR base: $PR_BASE"
           echo "PR head: $PR_HEAD"
