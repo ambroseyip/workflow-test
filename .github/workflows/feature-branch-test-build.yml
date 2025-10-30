@@ -29,14 +29,27 @@ jobs:
       - name: Detect code changes excluding README/docs
         id: check_changes
         run: |
-          MERGE_BASE=$(git merge-base origin/main HEAD)
+          MERGE_HEAD=${{ github.event.pull_request.head.sha }}
+          MERGE_TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
+          
+          # Get branch point
+          MERGE_BRANCH_POINT="$(git merge-base origin/$MERGE_TARGET_BRANCH $MERGE_HEAD)"
+          echo "Command: git merge-base origin/$MERGE_TARGET_BRANCH $MERGE_HEAD"
+          echo "Merge Head: $MERGE_HEAD"
+          echo "Branch point: $MERGE_BRANCH_POINT"
+          echo "Merge target branch: $MERGE_TARGET_BRANCH"
+          git merge-base origin/$MERGE_TARGET_BRANCH $MERGE_HEAD
+          echo "====="
           
           # Get list of changed files in the PR
-          CHANGED_FILES=$(git diff --name-only $MERGE_BASE ${{ github.event.after }})
-
+          CHANGED_FILES=$(git diff --name-only $MERGE_BRANCH_POINT $MERGE_HEAD)
+          echo "Changed Files: "
+          echo $CHANGED_FILES
+          echo " "
+          
           # Filter out files to ignore (README.md, docs/**)
           CODE_CHANGED=$(echo "$CHANGED_FILES" | grep -vE '${{ env.IGNORE_PATTERN }}')
-
+          
           # Output whether code changed
           if [ -z "$CODE_CHANGED" ]; then
             echo "No relevant code changes"
