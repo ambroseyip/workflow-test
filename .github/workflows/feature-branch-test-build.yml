@@ -29,12 +29,14 @@ jobs:
       - name: Detect code changes excluding README/docs
         id: check_changes
         run: |
-          echo "Pull request: ${{ github.event.pull_request.commits }})"
-          MERGE_BASE=$(git merge-base origin/main HEAD)
-          echo "Merge Base: $MERGE_BASE"
+          PR_BASE="${{ github.event.pull_request.base.sha }}"
+          PR_HEAD="${{ github.event.pull_request.head.sha }}"
+
+          echo "PR base: $PR_BASE"
+          echo "PR head: $PR_HEAD"
           
           # Get list of changed files in the PR
-          CHANGED_FILES=$(git diff --name-only $MERGE_BASE ${{ github.event.after }})
+          CHANGED_FILES=$(git diff --name-only $PR_BASE $PR_HEAD})
           echo "Changed Files: "
           echo $CHANGED_FILES
           echo " "
