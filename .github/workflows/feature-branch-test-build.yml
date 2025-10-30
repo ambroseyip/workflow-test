@@ -34,10 +34,12 @@ jobs:
           
           # Get branch point
           MERGE_BRANCH_POINT=$(git merge-base origin/$MERGE_TARGET_BRANCH $MERGE_HEAD)
-          echo "Command: git merge-base origin/$MERGE_TARGET_BRANCH $MERGE_HEAD)"
+          echo "Command: git merge-base origin/$MERGE_TARGET_BRANCH $MERGE_HEAD"
           echo "Merge Head: $MERGE_HEAD"
           echo "Branch point: $BRANCH_POINT"
           echo "Merge target branch: $MERGE_TARGET_BRANCH"
+          git merge-base origin/$MERGE_TARGET_BRANCH $MERGE_HEAD
+          echo "====="
           
           # Get list of changed files in the PR
           CHANGED_FILES=$(git diff --name-only $BRANCH_POINT $MERGE_HEAD)
