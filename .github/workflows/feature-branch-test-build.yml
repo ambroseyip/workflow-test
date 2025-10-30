@@ -11,6 +11,9 @@ permissions:
   id-token: write   # Required for OIDC auth
   contents: read    # Required to read repo contents
   
+env:
+  IGNORE_PATTERN: (^README\.md$|^.gitignore|^.vscode/)
+
 jobs:
   test-build:
     name: Test build
@@ -40,6 +43,8 @@ jobs:
           echo "Changed Files: "
           echo $CHANGED_FILES
           echo " "
+          
+          echo "${{ env.IGNORE_PATTERN }}"
           
           # Filter out files to ignore (README.md, docs/**)
           CODE_CHANGED=$(echo "$CHANGED_FILES" | grep -vE '(^README\.md$|^.gitignore|^.vscode/)')
