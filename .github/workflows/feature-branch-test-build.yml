@@ -30,9 +30,13 @@ jobs:
         id: check_changes
         run: |
           MERGE_BASE=$(git merge-base origin/main HEAD)
+          echo "Merge Base: $MERGE_BASE"
           
           # Get list of changed files in the PR
           CHANGED_FILES=$(git diff --name-only $MERGE_BASE ${{ github.event.after }})
+          echo "Changed Files: "
+          echo $CHANGED_FILES
+          echo " "
 
           # Filter out files to ignore (README.md, docs/**)
           CODE_CHANGED=$(echo "$CHANGED_FILES" | grep -vE '${{ env.IGNORE_PATTERN }}')
