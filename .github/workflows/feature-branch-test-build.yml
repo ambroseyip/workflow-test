@@ -29,6 +29,7 @@ jobs:
       - name: Detect code changes excluding README/docs
         id: check_changes
         run: |
+          COMMITS="${{ github.event.pull_request.commits }}"
           PR_BASE="${{ github.event.pull_request.base.sha }}"
           PR_HEAD="${{ github.event.pull_request.head.sha }}"
 
