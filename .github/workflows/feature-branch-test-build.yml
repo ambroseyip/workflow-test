@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0   # fetch full history
 
       - name: Detect code changes excluding README/docs
-        id: check_changes
+        id: check-changes
         run: |
           MERGE_HEAD=${{ github.event.pull_request.head.sha }}
           MERGE_TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
@@ -52,15 +52,15 @@ jobs:
           # Output whether code changed
           if [ -z "$CODE_CHANGED" ]; then
             echo "No relevant code changes"
-            echo "code_changed=false" >> $GITHUB_ENV
+            echo "code_changed=false" >> $GITHUB_OUTPUT
           else
             echo "Code changes detected:"
             echo "$CODE_CHANGED"
-            echo "code_changed=true" >> $GITHUB_ENV
+            echo "code_changed=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Test-Build
-        if: env.code_changed == 'true'
+        if: steps.check-changes.outputs == 'true'
         id: build
         run: |
           npm i
