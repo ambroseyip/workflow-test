@@ -1,0 +1,6 @@
+{
+    "editor.tabSize": 2,
+    "terminal.integrated.env.windows": {
+        "PATH": "F:\\Lab\\Tools\\node-v22.14.0-win-x64;${env:PATH}"
+    }
+}

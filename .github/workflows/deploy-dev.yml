@@ -1,0 +1,26 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  id-token: write   # Required for OIDC auth
+  contents: read    # Required to read repo contents
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build
+        run: |
+          npm i
+          npm run build
